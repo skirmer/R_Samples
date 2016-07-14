@@ -1,0 +1,310 @@
+% Two Stage Least Squares optimized for LaTeX %
+% Stephanie Kirmer %
+% July 2016 %
+% This script is a segment of a larger report and produces neatly formatted and tidy tables from 2SLS models.
+% The original usage was for an evaluation of an education intervention, so the metrics/covariate names here are education related.
+% I am including some of my normal header/format code but you don't need it necessarily- jump down to line 85 for the good stuff.
+
+
+%Make the page size right for paper and set the default font size for things
+\documentclass[11pt, letterpaper]{article}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+%Set the page margins
+\usepackage[left=0.65in, top=0.75in, right=0.65in, bottom=0.5in]{geometry}
+\usepackage[raggedright]{titlesec}
+\usepackage{tabularx}
+\usepackage{titling}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{wrapfig}
+\usepackage{fancyhdr}
+\usepackage{rotating}
+\usepackage{colortbl, xcolor}
+\usepackage{numprint}
+\usepackage{setspace}
+\usepackage{times}
+
+%Turn off indenting of paragraphs
+\setlength\parindent{0pt}
+
+%Format the title on the first page (left justified)
+\pretitle{\begin{flushleft}\huge}
+%write the actual title text
+\title{Paper Exhibits}
+\posttitle{\end{flushleft}}
+
+%Format the date on the first page (left justified)
+\predate{\begin{flushleft}}
+\postdate{\end{flushleft}}
+%Step 1 to make the first page include the letterhead stuff
+\pagestyle{fancy}
+
+%Set the page numbering style, if any
+\pagenumbering{gobble}
+
+%Add content for the letterhead
+\renewcommand{\headrulewidth}{0pt}
+\lhead{}
+\rhead{}
+\fancyfoot{}
+\fancyfoot[RO, RE]{\fontsize{10pt}{10pt} \selectfont \thepage}
+
+%Formatting for the tables later down the page
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\
+\arraybackslash\hspace{.1pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\
+\arraybackslash\hspace{.1pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\
+\arraybackslash\hspace{.1pt}}m{#1}}
+\newcolumntype{P}[1]{>{\raggedright\tabularxbackslash}p{#1}}
+
+%Change spacing within pages- header, footer, etc
+\headheight 23pt
+\headsep 5pt
+\footskip 10pt
+\setstretch{1.15}
+
+%End of header, start of text to be rendered
+\begin{document}
+
+%Make figures and images show up as the width of the text on the page (respects margins)
+\setkeys{Gin}{width=1\textwidth}
+
+%Set the font defaults
+\fontsize{11pt}{11pt}
+\fontfamily{ptm}
+\selectfont
+
+%Include this to make sure that the page will have a header
+\maketitle
+
+%Step 2 to make the first page include the letterhead stuff
+\thispagestyle{fancy}
+
+
+% TIME FOR THE GOOD STUFF! %
+%This assumes you've already loaded your clean dataset - I can clarify how it should look if needed.
+
+<<tcms_s1_treat_y2, echo=false, width=7, results=hide, tidy=true>>=
+suppressMessages(library(formattable))
+suppressMessages(library(knitr))
+suppressMessages(library(data.table))
+suppressMessages(library(dplyr))
+suppressMessages(library(xtable))
+
+pA <- mean(dataset$treat_y2[dataset$d==0])
+pB <- mean(dataset$treat_y2[dataset$d==1])
+pN <- 1-pB
+pC <- 1-pA-pN
+
+# Function produces EY, CCM must be calculated using results of tsls_fn
+ccm <- function(I) {
+  EYAC <<- mean(I[dataset$d==1 & dataset$treat_y2==1], na.rm=T)
+  EYA <<- mean(I[dataset$d==0 & dataset$treat_y2==1], na.rm=T)
+  EY <<- (EYAC*(1-pN)-EYA*pA)/pC
+  EY
+}
+
+treatment_comp_means <- data.frame(
+ccm(dataset$sy14mathgpa),
+ccm(dataset$sy15mathgpa),
+ccm(dataset$sy14mathfail),
+ccm(dataset$sy15mathfail),
+
+ccm(dataset$sy14z_mathxil),
+ccm(dataset$sy15z_mathxil),
+
+ccm(dataset$sy14corefailed),
+ccm(dataset$sy15corefailed),
+ccm(dataset$sy14coregpa),
+ccm(dataset$sy15coregpa),
+ccm(dataset$sy14gpa),
+ccm(dataset$sy15gpa),
+ccm(dataset$sy14corenonmathfail),
+ccm(dataset$sy15corenonmathfail),
+ccm(dataset$sy14nonmathfail),
+ccm(dataset$sy15nonmathfail),
+
+ccm(dataset$sy14z_readxil),
+ccm(dataset$sy15z_readxil))
+
+tcms_s1_treat_y2 <- t(treatment_comp_means)
+
+@
+
+<<tot_s1_treat_y2_calc, echo=false, width=7, tidy=true, results=hide>>=
+suppressMessages(library(formattable))
+suppressMessages(library(knitr))
+suppressMessages(library(data.table))
+suppressMessages(library(dplyr))
+suppressMessages(library(xtable))
+suppressMessages(library(sem))
+suppressMessages(library(AER))
+suppressMessages(library(ivpack))
+
+## 2-Stage Least Squares ####
+#=====================================#
+tsls_fn <- function(I) {
+  J <<- as.matrix(I)
+  model <<- ivreg(J~treat_y2+blocknum+
+                    d14+d15+d16+d17plus+
+                    dlearningdisabled+dfreelunch+
+                    dblack+dhispanic+
+                    dgrade9+
+                    sy13gpa_zeros+sy13As+sy13Bs+sy13Cs+sy13Ds+sy13Fs+missingsy13grades+
+                    sy13absent_zeros+missingsy13attend+
+                    sy13z_mathxil_zeros+
+                    sy13z_readxil_zeros+
+                    sy13z_mathxil_missing+
+                    sy13z_readxil_missing+
+                    sy13oss_dis_zeros+sy13incidents_zeros+
+                    any_arrests_pre+violent_pre+property_pre+drug_pre
+                  |
+                    assignment+blocknum+
+                    d14+d15+d16+d17plus+
+                    dlearningdisabled+dfreelunch+
+                    dblack+dhispanic+
+                    dgrade9+
+                    sy13gpa_zeros+sy13As+sy13Bs+sy13Cs+sy13Ds+sy13Fs+missingsy13grades+
+                    sy13absent_zeros+missingsy13attend+
+                    sy13z_mathxil_zeros+
+                    sy13z_readxil_zeros+
+                    sy13z_mathxil_missing+
+                    sy13z_readxil_missing+
+                    sy13oss_dis_zeros+sy13incidents_zeros+
+                    any_arrests_pre+violent_pre+property_pre+drug_pre,
+                    data=dataset)
+  totmod <<- summary(model)
+  totmod
+  robustmod <<- robust.se(model)
+  robustmod
+
+  c <- coef(model)
+  c[2]
+  require("arm")
+  d <- robust.se(model)
+  d[2,2]
+  #se.coef(model)
+  e <-  summary(model)$coefficients[,4]
+  e[2]
+  f<- nobs(model)
+
+  experiment <<- c(f, c[2], d[2,2], e[2])
+
+}
+
+
+## Math Achievement ####
+#=====================================#
+rm(results)
+
+tsls_fn(dataset$sy14mathgpa)
+results <- data.frame(sy14mathgpa=experiment)
+
+tsls_fn(dataset$sy15mathgpa)
+results <- data.frame(results, sy15mathgpa=experiment)
+
+tsls_fn(dataset$sy14mathfail)
+results <- data.frame(results, sy14mathfail=experiment)
+
+tsls_fn(dataset$sy15mathfail)
+results <- data.frame(results, sy15mathfail=experiment)
+
+tsls_fn(dataset$sy14z_mathxil)
+results <- data.frame(results, sy14z_mathxil=experiment)
+tsls_fn(dataset$sy15z_mathxil)
+results <- data.frame(results, sy15z_mathxil=experiment)
+
+#=====================================#
+## Reading/Other Achievement ####
+#=====================================#
+
+tsls_fn(dataset$sy14corefailed)
+results <- data.frame(results, sy14corefailed=experiment)
+
+tsls_fn(dataset$sy15corefailed)
+results <- data.frame(results, sy15corefailed=experiment)
+
+tsls_fn(dataset$sy14coregpa)
+results <- data.frame(results, sy14coregpa=experiment)
+
+tsls_fn(dataset$sy15coregpa)
+results <- data.frame(results, sy15coregpa=experiment)
+
+tsls_fn(dataset$sy14gpa)
+results <- data.frame(results, sy14gpa=experiment)
+
+tsls_fn(dataset$sy15gpa)
+results <- data.frame(results, sy15gpa=experiment)
+
+tsls_fn(dataset$sy14corenonmathfail)
+results <- data.frame(results, sy14corenonmathfail=experiment)
+
+tsls_fn(dataset$sy15corenonmathfail)
+results <- data.frame(results, sy15corenonmathfail=experiment)
+
+tsls_fn(dataset$sy14nonmathfail)
+results <- data.frame(results, sy14nonmathfail=experiment)
+
+tsls_fn(dataset$sy15nonmathfail)
+results <- data.frame(results, sy15nonmathfail=experiment)
+
+
+tsls_fn(dataset$sy14z_readxil)
+results <- data.frame(results, sy14z_readxil=experiment)
+tsls_fn(dataset$sy15z_readxil)
+results <- data.frame(results, sy15z_readxil=experiment)
+
+#=====================================####
+tot_result_table_treat_y2<-t(results)
+
+tot_display_treat_y2_s1 <- cbind(itt_result_table_s1[7], itt_result_table_s1[8], tot_result_table_treat_y2, tcms_s1_treat_y2)
+
+colnames(tot_display_treat_y2_s1) <- c("Control Mean", "ITT Estimate","N", "TOT Estimate","Robust Standard Error", "P Value", "TCM")
+
+#Label for significance ####
+tot_display_treat_y2_s1 <- as.data.frame(tot_display_treat_y2_s1)
+tot_display_treat_y2_s1$sig[tot_display_treat_y2_s1$"P Value" < .10] <- "*"
+tot_display_treat_y2_s1$sig[tot_display_treat_y2_s1$"P Value" < .05] <- "**"
+tot_display_treat_y2_s1$sig[tot_display_treat_y2_s1$"P Value" < .01] <- "***"
+tot_display_treat_y2_s1$sig[tot_display_treat_y2_s1$"P Value" >= .10] <- ""
+
+#Calculate the TCM #
+tot_display_treat_y2_s1 <- as.data.table(tot_display_treat_y2_s1, keep.rownames=T)
+tot_display_treat_y2_s1[,ccm := tot_display_treat_y2_s1$"TCM" - tot_display_treat_y2_s1$"TOT Estimate"]
+tot_display_treat_y2_s1 <- as.data.frame(tot_display_treat_y2_s1)
+row.names(tot_display_treat_y2_s1) <- tot_display_treat_y2_s1[,1]
+tot_display_treat_y2_s1 <- tot_display_treat_y2_s1[,-1]
+
+# Rounding #
+tot_display_treat_y2_s1$tcm_round <- round(tot_display_treat_y2_s1$TCM, 3)
+tot_display_treat_y2_s1$ccm_round <- round(tot_display_treat_y2_s1$ccm, 3)
+tot_display_treat_y2_s1$rounded_tot <- paste0(round(tot_display_treat_y2_s1$"TOT Estimate", 3), tot_display_treat_y2_s1$sig)
+tot_display_treat_y2_s1$standarderr_rounded <- paste0("(",  round(tot_display_treat_y2_s1$"Robust Standard Error", 3), ")")
+tot_display_treat_y2_s1_display <- tot_display_treat_y2_s1[,c(1:3,10:13)]
+
+colnames(tot_display_treat_y2_s1_display)[4] <- "Treatment Complier Mean"
+colnames(tot_display_treat_y2_s1_display)[5] <- "Control Complier Mean"
+colnames(tot_display_treat_y2_s1_display)[6] <- "TOT Estimate"
+colnames(tot_display_treat_y2_s1_display)[7] <- "Robust SE"
+
+tot_display_treat_y2_s1_display <- tot_display_treat_y2_s1_display[,c(3,1,2,6,7,4,5)]
+
+@
+
+
+<<tot_s1_treat_y2, echo=false, width=5, results=tex, tidy=true>>=
+print(xtable(tot_display_treat_y2_s1_display,
+            align=c("L{5.8cm}","L{1cm}","L{1.3cm}","L{1.5cm}","L{1.5cm}","L{1.3cm}","L{1.5cm}","L{1.5cm}"),
+             caption="Study 1 TOT, Treated Year 2",
+            digits=c(0,0,3,0,0,0,3,3), booktabs=TRUE,
+            include.rownames=TRUE,
+            format.args=list(big.mark=",")),floating=TRUE,table.placement="!h",
+        add.to.row=list(pos=list(0, 6), command=c('\\\\\n Mathematics \\\\\n', '\\\\\n Other Academics \\\\\n')),
+            size="\\footnotesize", caption.placement="top",include.colnames=TRUE, hline.after=c(-1,0,6, nrow(tot_display_treat_y2_s1_display)))
+
+@
+
+
+\end{document}
