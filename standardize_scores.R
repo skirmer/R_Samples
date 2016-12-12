@@ -25,17 +25,17 @@ library("ggrepel")
 #Make a table of all the test/subject/year options for placing in the function below.
 
 test_scores_1 <- expand.grid(masterfile="master_dataset",
-                             testcolumn=c("plan_pre", "explore_gr9_pre", "explore_gr8_pre", "nwea_pre"),
+                             testcolumn=c("test1_pre", "test2_pre", "test3_pre", "test4_pre"),
                              scorecolumn=c("readxil_pre","mathxil_pre"),
                              yr=c(1,2))
 
 test_scores_2 <- expand.grid(masterfile="master_dataset",
-                             testcolumn=c("plan_post1", "explore_post1", "act_post1"),
+                             testcolumn=c("test1_post1", "test2_post1", "test3_post1"),
                              scorecolumn=c("readxil_post1","mathxil_post1"),
                              yr=c(1,2))
 
 test_scores_3 <- expand.grid(masterfile="master_dataset",
-                             testcolumn=c("plan_post2","explore_post2","act_post2"),
+                             testcolumn=c("test1_post2","test2_post2","test3_post2"),
                              scorecolumn=c("readxil_post2","mathxil_post2"),
                              yr=c(1,2))
 
@@ -87,44 +87,44 @@ compiled_ss <- cmpfun(scaled_scores)
 mapply(compiled_ss, test_scores$masterfile, test_scores$testcolumn, test_scores$scorecolumn, test_scores$yr) #Run the function
 
 # Combine the various output frames from the function ####
-scaled_scores_pre_read <- rbind(outputfile_plan_pre_readxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
-                                outputfile_explore_gr8_pre_readxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
-                                outputfile_explore_gr9_pre_readxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
-                                outputfile_nwea_pre_readxil_pre[,c("SID", "Scaledscore"), with=FALSE])
+scaled_scores_pre_read <- rbind(outputfile_test1_pre_readxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
+                                outputfile_test2_pre_readxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
+                                outputfile_test3_pre_readxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
+                                outputfile_test4_pre_readxil_pre[,c("SID", "Scaledscore"), with=FALSE])
 
 scaled_scores_pre_read <- plyr::rename(scaled_scores_pre_read,c("Scaledscore"="readxil_z_pre"))
 
-scaled_scores_pre_math <- rbind(outputfile_plan_pre_mathxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
-                                outputfile_explore_gr8_pre_mathxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
-                                outputfile_explore_gr9_pre_mathxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
-                                outputfile_nwea_pre_mathxil_pre[,c("SID", "Scaledscore"), with=FALSE])
+scaled_scores_pre_math <- rbind(outputfile_test1_pre_mathxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
+                                outputfile_test2_pre_mathxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
+                                outputfile_test3_pre_mathxil_pre_1[,c("SID", "Scaledscore"), with=FALSE],
+                                outputfile_test4_pre_mathxil_pre[,c("SID", "Scaledscore"), with=FALSE])
 
 scaled_scores_pre_math <- plyr::rename(scaled_scores_pre_math,c("Scaledscore"="mathxil_z_pre"))
 
 
-scaled_scores_post1_read <- rbind(outputfile_plan_post1_readxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
-                                  outputfile_explore_post1_readxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
-                                  outputfile_act_post1_readxil_post1[,c("SID", "Scaledscore"), with=FALSE])
+scaled_scores_post1_read <- rbind(outputfile_test1_post1_readxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
+                                  outputfile_test2_post1_readxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
+                                  outputfile_test3_post1_readxil_post1[,c("SID", "Scaledscore"), with=FALSE])
 
 scaled_scores_post1_read <- plyr::rename(scaled_scores_post1_read,c("Scaledscore"="readxil_z_post1"))
 
-scaled_scores_post1_math <- rbind(outputfile_plan_post1_mathxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
-                                  outputfile_explore_post1_mathxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
-                                  outputfile_act_post1_mathxil_post1[,c("SID", "Scaledscore"), with=FALSE])
+scaled_scores_post1_math <- rbind(outputfile_test1_post1_mathxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
+                                  outputfile_test2_post1_mathxil_post1_1[,c("SID", "Scaledscore"), with=FALSE],
+                                  outputfile_test3_post1_mathxil_post1[,c("SID", "Scaledscore"), with=FALSE])
 
 scaled_scores_post1_math <- plyr::rename(scaled_scores_post1_math,c("Scaledscore"="mathxil_z_post1"))
 
 
 scaled_scores_post2_read <- rbind(
-  outputfile_explore_post2_readxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
-  outputfile_act_post2_readxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
-  outputfile_plan_post2_readxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
+  outputfile_test1_post2_readxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
+  outputfile_test2_post2_readxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
+  outputfile_test3_post2_readxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
 scaled_scores_post2_read <- plyr::rename(scaled_scores_post2_read,c("Scaledscore"="readxil_z_post2"))
 
 scaled_scores_post2_math <- rbind(
-  outputfile_explore_post2_mathxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
-  outputfile_act_post2_mathxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
-  outputfile_plan_post2_mathxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
+  outputfile_test1_post2_mathxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
+  outputfile_test2_post2_mathxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
+  outputfile_test3_post2_mathxil_post2_1[,c("SID", "Scaledscore"), with=FALSE],
 
 scaled_scores_post2_math <- plyr::rename(scaled_scores_post2_math,c("Scaledscore"="mathxil_z_post2"))
 
