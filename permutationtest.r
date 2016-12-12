@@ -77,11 +77,11 @@ bs_nopost <- function(data, indices, M) {
   # Calculate new standardization #
   d[d$test1_pre==1, rescaled_math_test1_pre := (d$mathxil_pre-mean_math_test1_pre)/sd_math_test1_pre]
   d[d$test2_pre==1, rescaled_math_test2_pre := (d$mathxil_pre-mean_math_test2_pre)/sd_math_test2_pre]
-  d[d$test3_pre==1, rescaled_math_exp8_pre := (d$mathxil_pre-mean_math_test3_pre)/sd_math_test3_pre]
+  d[d$test3_pre==1, rescaled_math_test3_pre := (d$mathxil_pre-mean_math_test3_pre)/sd_math_test3_pre]
 
   d[d$test1_pre==1, rescaled_read_test1_pre := (d$readxil_pre-mean_read_test1_pre)/sd_read_test1_pre]
   d[d$test2_pre==1, rescaled_read_test2_pre := (d$readxil_pre-mean_read_test2_pre)/sd_read_test2_pre]
-  d[d$test3_pre==1, rescaled_read_exp8_pre := (d$readxil_pre-mean_read_test3_pre)/sd_read_test3_pre]
+  d[d$test3_pre==1, rescaled_read_test3_pre := (d$readxil_pre-mean_read_test3_pre)/sd_read_test3_pre]
 
   d[,rescaled_math_pre := rescaled_math_test1_pre]
   d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_test2_pre]
@@ -165,11 +165,11 @@ bs_post <- function(data, indices, M) {
   # Calculate new standardization #
   d[d$test1_pre==1, rescaled_math_test1_pre := (d$mathxil_pre-mean_math_test1_pre)/sd_math_test1_pre]
   d[d$test2_pre==1, rescaled_math_test2_pre := (d$mathxil_pre-mean_math_test2_pre)/sd_math_test2_pre]
-  d[d$test3_pre==1, rescaled_math_exp8_pre := (d$mathxil_pre-mean_math_test3_pre)/sd_math_test3_pre]
+  d[d$test3_pre==1, rescaled_math_test3_pre := (d$mathxil_pre-mean_math_test3_pre)/sd_math_test3_pre]
 
   d[d$test1_pre==1, rescaled_read_test1_pre := (d$readxil_pre-mean_read_test1_pre)/sd_read_test1_pre]
   d[d$test2_pre==1, rescaled_read_test2_pre := (d$readxil_pre-mean_read_test2_pre)/sd_read_test2_pre]
-  d[d$test3_pre==1, rescaled_read_exp8_pre := (d$readxil_pre-mean_read_test3_pre)/sd_read_test3_pre]
+  d[d$test3_pre==1, rescaled_read_test3_pre := (d$readxil_pre-mean_read_test3_pre)/sd_read_test3_pre]
 
   d[d$test1_post1==1, rescaled_math_test1_post1 := (d$mathxil_post1-mean_math_test1_post1)/sd_math_test1_post1]
   d[d$test2_post1==1, rescaled_math_test2_post1 := (d$mathxil_post1-mean_math_test2_post1)/sd_math_test2_post1]
