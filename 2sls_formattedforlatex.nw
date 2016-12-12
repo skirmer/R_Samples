@@ -107,27 +107,7 @@ ccm <- function(I) {
 }
 
 treatment_comp_means <- data.frame(
-ccm(dataset$sy14mathgpa),
-ccm(dataset$sy15mathgpa),
-ccm(dataset$sy14mathfail),
-ccm(dataset$sy15mathfail),
-
-ccm(dataset$sy14z_mathxil),
-ccm(dataset$sy15z_mathxil),
-
-ccm(dataset$sy14corefailed),
-ccm(dataset$sy15corefailed),
-ccm(dataset$sy14coregpa),
-ccm(dataset$sy15coregpa),
-ccm(dataset$sy14gpa),
-ccm(dataset$sy15gpa),
-ccm(dataset$sy14corenonmathfail),
-ccm(dataset$sy15corenonmathfail),
-ccm(dataset$sy14nonmathfail),
-ccm(dataset$sy15nonmathfail),
-
-ccm(dataset$sy14z_readxil),
-ccm(dataset$sy15z_readxil))
+ccm(dataset$gpa))
 
 tcms_s1_treat_y2 <- t(treatment_comp_means)
 
@@ -148,32 +128,10 @@ suppressMessages(library(ivpack))
 tsls_fn <- function(I) {
   J <<- as.matrix(I)
   model <<- ivreg(J~treat_y2+blocknum+
-                    d14+d15+d16+d17plus+
-                    dlearningdisabled+dfreelunch+
-                    dblack+dhispanic+
-                    dgrade9+
-                    sy13gpa_zeros+sy13As+sy13Bs+sy13Cs+sy13Ds+sy13Fs+missingsy13grades+
-                    sy13absent_zeros+missingsy13attend+
-                    sy13z_mathxil_zeros+
-                    sy13z_readxil_zeros+
-                    sy13z_mathxil_missing+
-                    sy13z_readxil_missing+
-                    sy13oss_dis_zeros+sy13incidents_zeros+
-                    any_arrests_pre+violent_pre+property_pre+drug_pre
+                    [insert your covariates]
                   |
                     assignment+blocknum+
-                    d14+d15+d16+d17plus+
-                    dlearningdisabled+dfreelunch+
-                    dblack+dhispanic+
-                    dgrade9+
-                    sy13gpa_zeros+sy13As+sy13Bs+sy13Cs+sy13Ds+sy13Fs+missingsy13grades+
-                    sy13absent_zeros+missingsy13attend+
-                    sy13z_mathxil_zeros+
-                    sy13z_readxil_zeros+
-                    sy13z_mathxil_missing+
-                    sy13z_readxil_missing+
-                    sy13oss_dis_zeros+sy13incidents_zeros+
-                    any_arrests_pre+violent_pre+property_pre+drug_pre,
+                    [insert your covariates],
                     data=dataset)
   totmod <<- summary(model)
   totmod
@@ -199,62 +157,8 @@ tsls_fn <- function(I) {
 #=====================================#
 rm(results)
 
-tsls_fn(dataset$sy14mathgpa)
-results <- data.frame(sy14mathgpa=experiment)
-
-tsls_fn(dataset$sy15mathgpa)
-results <- data.frame(results, sy15mathgpa=experiment)
-
-tsls_fn(dataset$sy14mathfail)
-results <- data.frame(results, sy14mathfail=experiment)
-
-tsls_fn(dataset$sy15mathfail)
-results <- data.frame(results, sy15mathfail=experiment)
-
-tsls_fn(dataset$sy14z_mathxil)
-results <- data.frame(results, sy14z_mathxil=experiment)
-tsls_fn(dataset$sy15z_mathxil)
-results <- data.frame(results, sy15z_mathxil=experiment)
-
-#=====================================#
-## Reading/Other Achievement ####
-#=====================================#
-
-tsls_fn(dataset$sy14corefailed)
-results <- data.frame(results, sy14corefailed=experiment)
-
-tsls_fn(dataset$sy15corefailed)
-results <- data.frame(results, sy15corefailed=experiment)
-
-tsls_fn(dataset$sy14coregpa)
-results <- data.frame(results, sy14coregpa=experiment)
-
-tsls_fn(dataset$sy15coregpa)
-results <- data.frame(results, sy15coregpa=experiment)
-
-tsls_fn(dataset$sy14gpa)
-results <- data.frame(results, sy14gpa=experiment)
-
-tsls_fn(dataset$sy15gpa)
-results <- data.frame(results, sy15gpa=experiment)
-
-tsls_fn(dataset$sy14corenonmathfail)
-results <- data.frame(results, sy14corenonmathfail=experiment)
-
-tsls_fn(dataset$sy15corenonmathfail)
-results <- data.frame(results, sy15corenonmathfail=experiment)
-
-tsls_fn(dataset$sy14nonmathfail)
-results <- data.frame(results, sy14nonmathfail=experiment)
-
-tsls_fn(dataset$sy15nonmathfail)
-results <- data.frame(results, sy15nonmathfail=experiment)
-
-
-tsls_fn(dataset$sy14z_readxil)
-results <- data.frame(results, sy14z_readxil=experiment)
-tsls_fn(dataset$sy15z_readxil)
-results <- data.frame(results, sy15z_readxil=experiment)
+tsls_fn(dataset$gpa)
+results <- data.frame(gpa=experiment)
 
 #=====================================####
 tot_result_table_treat_y2<-t(results)
