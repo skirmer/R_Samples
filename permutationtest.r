@@ -30,9 +30,7 @@ library(resample)
 library(boot)
 library(data.table)
 
-master_dataset_1<- read.csv("/export/projects/BAM/Match_AnalysisFiles_May2016/SourceFiles/Archive/analysisdata_study1.csv", stringsAsFactors=F)
-# print(table(master_dataset_1$blocknum, master_dataset_1$dmatch ,dnn=c("block", "pseudoT"), useNA="ifany"))
-
+master_dataset_1<- read.csv("/analysisdata_study1.csv", stringsAsFactors=F)
 
 # function to obtain regression output for each resample ####
 
@@ -58,41 +56,41 @@ bs_nopost <- function(data, indices, M) {
 
   # Standardize the test scores (baseline and post 1) so that the model is right
   # Going with the simplistic tedious approach -  this is also a bit faster than the alternatives, but 
-  mean_math_plan_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  sd_math_plan_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  mean_math_exp9_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  sd_math_exp9_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  mean_math_exp8_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
-  sd_math_exp8_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
+  mean_math_test1_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  sd_math_test1_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  mean_math_test2_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  sd_math_test2_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  mean_math_test3_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
+  sd_math_test3_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
 
-  mean_read_plan_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  sd_read_plan_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  mean_read_exp9_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  sd_read_exp9_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  mean_read_exp8_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
-  sd_read_exp8_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
+  mean_read_test1_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  sd_read_test1_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  mean_read_test2_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  sd_read_test2_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  mean_read_test3_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
+  sd_read_test3_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
 
   #if anything is NA then make it zero - you'll get a message if this is an issue.
-  sd_math_plan_pre[is.na(sd_math_plan_pre)] <- 0
+  sd_math_test1_pre[is.na(sd_math_test1_pre)] <- 0
 
 
   # Calculate new standardization #
-  d[d$plan_pre==1, rescaled_math_plan_pre := (d$mathxil_pre-mean_math_plan_pre)/sd_math_plan_pre]
-  d[d$explore_gr9_pre==1, rescaled_math_exp9_pre := (d$mathxil_pre-mean_math_exp9_pre)/sd_math_exp9_pre]
-  d[d$explore_gr8_pre==1, rescaled_math_exp8_pre := (d$mathxil_pre-mean_math_exp8_pre)/sd_math_exp8_pre]
+  d[d$test1_pre==1, rescaled_math_test1_pre := (d$mathxil_pre-mean_math_test1_pre)/sd_math_test1_pre]
+  d[d$test2_pre==1, rescaled_math_test2_pre := (d$mathxil_pre-mean_math_test2_pre)/sd_math_test2_pre]
+  d[d$test3_pre==1, rescaled_math_exp8_pre := (d$mathxil_pre-mean_math_test3_pre)/sd_math_test3_pre]
 
-  d[d$plan_pre==1, rescaled_read_plan_pre := (d$readxil_pre-mean_read_plan_pre)/sd_read_plan_pre]
-  d[d$explore_gr9_pre==1, rescaled_read_exp9_pre := (d$readxil_pre-mean_read_exp9_pre)/sd_read_exp9_pre]
-  d[d$explore_gr8_pre==1, rescaled_read_exp8_pre := (d$readxil_pre-mean_read_exp8_pre)/sd_read_exp8_pre]
+  d[d$test1_pre==1, rescaled_read_test1_pre := (d$readxil_pre-mean_read_test1_pre)/sd_read_test1_pre]
+  d[d$test2_pre==1, rescaled_read_test2_pre := (d$readxil_pre-mean_read_test2_pre)/sd_read_test2_pre]
+  d[d$test3_pre==1, rescaled_read_exp8_pre := (d$readxil_pre-mean_read_test3_pre)/sd_read_test3_pre]
 
-  d[,rescaled_math_pre := rescaled_math_plan_pre]
-  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_exp9_pre]
-  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_exp8_pre]
+  d[,rescaled_math_pre := rescaled_math_test1_pre]
+  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_test2_pre]
+  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_test3_pre]
   d[is.na(rescaled_math_pre),rescaled_math_pre := 0]
 
-  d[,rescaled_read_pre := rescaled_read_plan_pre]
-  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_exp9_pre]
-  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_exp8_pre]
+  d[,rescaled_read_pre := rescaled_read_test1_pre]
+  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_test2_pre]
+  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_test3_pre]
   d[is.na(rescaled_read_pre),rescaled_read_pre := 0]
 
   d <- as.data.frame(d)
@@ -102,10 +100,7 @@ bs_nopost <- function(data, indices, M) {
 I <- eval(parse(text=M))
 
   runmodel <- function(I) {
-    fit <- lm(I~pseudoT+ blocknum+ d13andunder+d14+d15+d16+d17andover+ dlearningdisabled+dfreelunch+ dblack+ dhispanic+dother+
-               dgrade9+ dgrade10+ gpa_pre_zeros+ numAs_pre+  numBs_pre+ numCs_pre+ numDs_pre+ numFs_pre+ missing_gpa_pre+ days_absent_pre_zeros+
-               missing_attend_pre+ rescaled_math_pre+  rescaled_read_pre +mathxil_z_pre_missing+readxil_z_pre_missing+ oss_dis_pre_zeros+
-               incidents_pre_zeros+any_arrests_pre+violent_pre+property_pre+drug_pre, data=d)
+    fit <- lm(I~pseudoT+ [insert your baseline covariates], data=d)
     summary(fit)
     #t-test
     output <<- summary(fit)$coefficients["pseudoT",3]
@@ -135,73 +130,73 @@ bs_post <- function(data, indices, M) {
 
   # Standardize the test scores (baseline and post 1) so that the model is right
   # Going with the simplistic tedious approach
-  mean_math_plan_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  sd_math_plan_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  mean_math_exp9_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  sd_math_exp9_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  mean_math_exp8_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
-  sd_math_exp8_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
+  mean_math_test1_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  sd_math_test1_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  mean_math_test2_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  sd_math_test2_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  mean_math_test3_pre <- mean(d$mathxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
+  sd_math_test3_pre <- sd(d$mathxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
 
-  mean_read_plan_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  sd_read_plan_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$plan_pre==1], na.rm=T)
-  mean_read_exp9_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  sd_read_exp9_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$explore_gr9_pre==1], na.rm=T)
-  mean_read_exp8_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
-  sd_read_exp8_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$explore_gr8_pre==1], na.rm=T)
+  mean_read_test1_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  sd_read_test1_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$test1_pre==1], na.rm=T)
+  mean_read_test2_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  sd_read_test2_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$test2_pre==1], na.rm=T)
+  mean_read_test3_pre <- mean(d$readxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
+  sd_read_test3_pre <- sd(d$readxil_pre[d$pseudoT==0 & d$test3_pre==1], na.rm=T)
 
-  mean_math_plan_post1 <- mean(d$mathxil_post1[d$pseudoT==0 & d$plan_post1==1], na.rm=T)
-  sd_math_plan_post1 <- sd(d$mathxil_post1[d$pseudoT==0 & d$plan_post1==1], na.rm=T)
-  mean_math_exp_post1 <- mean(d$mathxil_post1[d$pseudoT==0 & d$explore_post1==1], na.rm=T)
-  sd_math_exp_post1 <- sd(d$mathxil_post1[d$pseudoT==0 & d$explore_post1==1], na.rm=T)
-  mean_math_act_post1 <- mean(d$mathxil_post1[d$pseudoT==0 & d$act_post1==1], na.rm=T)
-  sd_math_act_post1 <- sd(d$mathxil_post1[d$pseudoT==0 & d$act_post1==1], na.rm=T)
+  mean_math_test1_post1 <- mean(d$mathxil_post1[d$pseudoT==0 & d$test1_post1==1], na.rm=T)
+  sd_math_test1_post1 <- sd(d$mathxil_post1[d$pseudoT==0 & d$test1_post1==1], na.rm=T)
+  mean_math_test2_post1 <- mean(d$mathxil_post1[d$pseudoT==0 & d$test2_post1==1], na.rm=T)
+  sd_math_test2_post1 <- sd(d$mathxil_post1[d$pseudoT==0 & d$test2_post1==1], na.rm=T)
+  mean_math_test3_post1 <- mean(d$mathxil_post1[d$pseudoT==0 & d$test3_post1==1], na.rm=T)
+  sd_math_test3_post1 <- sd(d$mathxil_post1[d$pseudoT==0 & d$test3_post1==1], na.rm=T)
 
-  mean_read_plan_post1 <- mean(d$readxil_post1[d$pseudoT==0 & d$plan_post1==1], na.rm=T)
-  sd_read_plan_post1 <- sd(d$readxil_post1[d$pseudoT==0 & d$plan_post1==1], na.rm=T)
-  mean_read_exp_post1 <- mean(d$readxil_post1[d$pseudoT==0 & d$explore_post1==1], na.rm=T)
-  sd_read_exp_post1 <- sd(d$readxil_post1[d$pseudoT==0 & d$explore_post1==1], na.rm=T)
-  mean_read_act_post1 <- mean(d$readxil_post1[d$pseudoT==0 & d$act_post1==1], na.rm=T)
-  sd_read_act_post1 <- sd(d$readxil_post1[d$pseudoT==0 & d$act_post1==1], na.rm=T)
+  mean_read_test1_post1 <- mean(d$readxil_post1[d$pseudoT==0 & d$test1_post1==1], na.rm=T)
+  sd_read_test1_post1 <- sd(d$readxil_post1[d$pseudoT==0 & d$test1_post1==1], na.rm=T)
+  mean_read_test2_post1 <- mean(d$readxil_post1[d$pseudoT==0 & d$test2_post1==1], na.rm=T)
+  sd_read_test2_post1 <- sd(d$readxil_post1[d$pseudoT==0 & d$test2_post1==1], na.rm=T)
+  mean_read_test3_post1 <- mean(d$readxil_post1[d$pseudoT==0 & d$test3_post1==1], na.rm=T)
+  sd_read_test3_post1 <- sd(d$readxil_post1[d$pseudoT==0 & d$test3_post1==1], na.rm=T)
 
-  #if anything is NA then make it zero -  act has been a problem on this, might also run into it on plan pre
-  sd_math_plan_pre[is.na(sd_math_plan_pre)] <- 0
-  sd_math_act_post1[is.na(sd_math_act_post1)] <- 0
+  #if anything is NA then make it zero
+  sd_math_test1_pre[is.na(sd_math_test1_pre)] <- 0
+  sd_math_test3_post1[is.na(sd_math_test3_post1)] <- 0
 
   # Calculate new standardization #
-  d[d$plan_pre==1, rescaled_math_plan_pre := (d$mathxil_pre-mean_math_plan_pre)/sd_math_plan_pre]
-  d[d$explore_gr9_pre==1, rescaled_math_exp9_pre := (d$mathxil_pre-mean_math_exp9_pre)/sd_math_exp9_pre]
-  d[d$explore_gr8_pre==1, rescaled_math_exp8_pre := (d$mathxil_pre-mean_math_exp8_pre)/sd_math_exp8_pre]
+  d[d$test1_pre==1, rescaled_math_test1_pre := (d$mathxil_pre-mean_math_test1_pre)/sd_math_test1_pre]
+  d[d$test2_pre==1, rescaled_math_test2_pre := (d$mathxil_pre-mean_math_test2_pre)/sd_math_test2_pre]
+  d[d$test3_pre==1, rescaled_math_exp8_pre := (d$mathxil_pre-mean_math_test3_pre)/sd_math_test3_pre]
 
-  d[d$plan_pre==1, rescaled_read_plan_pre := (d$readxil_pre-mean_read_plan_pre)/sd_read_plan_pre]
-  d[d$explore_gr9_pre==1, rescaled_read_exp9_pre := (d$readxil_pre-mean_read_exp9_pre)/sd_read_exp9_pre]
-  d[d$explore_gr8_pre==1, rescaled_read_exp8_pre := (d$readxil_pre-mean_read_exp8_pre)/sd_read_exp8_pre]
+  d[d$test1_pre==1, rescaled_read_test1_pre := (d$readxil_pre-mean_read_test1_pre)/sd_read_test1_pre]
+  d[d$test2_pre==1, rescaled_read_test2_pre := (d$readxil_pre-mean_read_test2_pre)/sd_read_test2_pre]
+  d[d$test3_pre==1, rescaled_read_exp8_pre := (d$readxil_pre-mean_read_test3_pre)/sd_read_test3_pre]
 
-  d[d$plan_post1==1, rescaled_math_plan_post1 := (d$mathxil_post1-mean_math_plan_post1)/sd_math_plan_post1]
-  d[d$explore_post1==1, rescaled_math_exp_post1 := (d$mathxil_post1-mean_math_exp_post1)/sd_math_exp_post1]
-  d[d$act_post1==1, rescaled_math_act_post1 := (d$mathxil_post1-mean_math_act_post1)/sd_math_act_post1]
+  d[d$test1_post1==1, rescaled_math_test1_post1 := (d$mathxil_post1-mean_math_test1_post1)/sd_math_test1_post1]
+  d[d$test2_post1==1, rescaled_math_test2_post1 := (d$mathxil_post1-mean_math_test2_post1)/sd_math_test2_post1]
+  d[d$test3_post1==1, rescaled_math_test3_post1 := (d$mathxil_post1-mean_math_test3_post1)/sd_math_test3_post1]
 
-  d[d$plan_post1==1, rescaled_read_plan_post1 := (d$readxil_post1-mean_read_plan_post1)/sd_read_plan_post1]
-  d[d$explore_post1==1, rescaled_read_exp_post1 := (d$readxil_post1-mean_read_exp_post1)/sd_read_exp_post1]
-  d[d$act_post1==1, rescaled_read_act_post1 := (d$readxil_post1-mean_read_act_post1)/sd_read_act_post1]
+  d[d$test1_post1==1, rescaled_read_test1_post1 := (d$readxil_post1-mean_read_test1_post1)/sd_read_test1_post1]
+  d[d$test2_post1==1, rescaled_read_test2_post1 := (d$readxil_post1-mean_read_test2_post1)/sd_read_test2_post1]
+  d[d$test3_post1==1, rescaled_read_test3_post1 := (d$readxil_post1-mean_read_test3_post1)/sd_read_test3_post1]
 
-  d[,rescaled_math_pre := rescaled_math_plan_pre]
-  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_exp9_pre]
-  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_exp8_pre]
+  d[,rescaled_math_pre := rescaled_math_test1_pre]
+  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_test2_pre]
+  d[is.na(rescaled_math_pre),rescaled_math_pre := rescaled_math_test3_pre]
   d[is.na(rescaled_math_pre),rescaled_math_pre := 0]
 
-  d[,rescaled_read_pre := rescaled_read_plan_pre]
-  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_exp9_pre]
-  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_exp8_pre]
+  d[,rescaled_read_pre := rescaled_read_test1_pre]
+  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_test2_pre]
+  d[is.na(rescaled_read_pre),rescaled_read_pre := rescaled_read_test3_pre]
   d[is.na(rescaled_read_pre),rescaled_read_pre := 0]
 
-  d[,rescaled_math_post1 := rescaled_math_plan_post1]
-  d[is.na(rescaled_math_post1),rescaled_math_post1 := rescaled_math_exp_post1]
-  d[is.na(rescaled_math_post1) & sd_math_act_post1 >0,rescaled_math_post1 := rescaled_math_act_post1]
+  d[,rescaled_math_post1 := rescaled_math_test1_post1]
+  d[is.na(rescaled_math_post1),rescaled_math_post1 := rescaled_math_test2_post1]
+  d[is.na(rescaled_math_post1) & sd_math_test3_post1 >0,rescaled_math_post1 := rescaled_math_test3_post1]
   d[is.na(rescaled_math_post1), rescaled_math_post1 := 0]
 
-  d[,rescaled_read_post1 := rescaled_read_plan_post1]
-  d[is.na(rescaled_read_post1),rescaled_read_post1 := rescaled_read_exp_post1]
-  d[is.na(rescaled_read_post1) & sd_read_act_post1 >0,rescaled_read_post1 := rescaled_read_act_post1]
+  d[,rescaled_read_post1 := rescaled_read_test1_post1]
+  d[is.na(rescaled_read_post1),rescaled_read_post1 := rescaled_read_test2_post1]
+  d[is.na(rescaled_read_post1) & sd_read_test3_post1 >0,rescaled_read_post1 := rescaled_read_test3_post1]
   d[is.na(rescaled_read_post1), rescaled_read_post1 := 0]
 
   d <- as.data.frame(d)
@@ -211,10 +206,7 @@ bs_post <- function(data, indices, M) {
   I <- eval(parse(text=M))
 
   runmodel <- function(I) {
-    fit <- lm(I~pseudoT+ blocknum+ d13andunder+d14+d15+d16+d17andover+ dlearningdisabled+dfreelunch+ dblack+ dhispanic+dother+ 
-                dgrade9+ dgrade10+ gpa_pre_zeros+ numAs_pre+  numBs_pre+ numCs_pre+ numDs_pre+ numFs_pre+ missing_gpa_pre+ days_absent_pre_zeros+
-                missing_attend_pre+ rescaled_math_pre+  rescaled_read_pre +mathxil_z_pre_missing+readxil_z_pre_missing+ oss_dis_pre_zeros+
-                incidents_pre_zeros+any_arrests_pre+violent_pre+property_pre+drug_pre, data=d)
+    fit <- lm(I~pseudoT+ [insert your covariates], data=d)
     summary(fit)
     #t-test
     output <<- summary(fit)$coefficients["pseudoT",3]
